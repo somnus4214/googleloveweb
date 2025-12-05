@@ -1,13 +1,14 @@
-# LoveSpace 网站 - 树莓派部署指南
 
-本文档将指导你如何在树莓派上构建并部署“LoveSpace”恋爱纪念日网站，并使用 Cloudflare Tunnel 将其发布到公网。
+# LoveSpace 网站 - 树莓派部署指南 (DeepSeek 版)
+
+本文档将指导你如何在树莓派上构建并部署“LoveSpace”恋爱纪念日网站，并使用 Cloudflare Tunnel 将其发布到公网。本项目已针对中国内地网络环境优化，使用 DeepSeek API 替代 Google Gemini。
 
 ## 准备工作
 
-*   **硬件**: 树莓派 (Raspberry Pi 3B+ 或更佳)，已安装 Raspberry Pi OS (或其他 Linux 发行版)。
+*   **硬件**: 树莓派 (Raspberry Pi 3B+ 或更佳)，已安装 Raspberry Pi OS。
 *   **网络**: 树莓派已连接网络。
 *   **域名**: 你拥有的一个域名 (已托管在 Cloudflare)。
-*   **账号**: Cloudflare 账号。
+*   **DeepSeek API Key**: 访问 [DeepSeek 开放平台](https://platform.deepseek.com/) 注册并申请 API Key。
 
 ---
 
@@ -47,14 +48,15 @@
     ```
 
 2.  **安装依赖**:
-    安装项目所需的库：
+    安装项目所需的库（已移除 Google GenAI，改用原生 fetch）：
     ```bash
-    npm install lucide-react date-fns @google/genai
+    npm install lucide-react date-fns
     ```
 
 3.  **迁移代码**:
     将你现在的代码文件复制到 `lovespace/src` 目录中。
     *   删除 `src/App.css` (我们使用 Tailwind CSS)。
+    *   **重要**：如果你之前有 `services/geminiService.ts`，请删除它，并确保使用了新的 `services/aiService.ts`。
     *   确保文件结构如下：
         ```
         lovespace/
@@ -68,54 +70,22 @@
         │   │   ├── DaysCounter.tsx
         │   │   ├── ...
         │   └── services/
-        │       └── geminiService.ts
+        │       └── aiService.ts  <-- 核心 AI 服务文件
         ```
 
 4.  **修改 `index.html`**:
-    打开 `lovespace/index.html`，在 `<head>` 标签内添加 Tailwind CSS 的 CDN 链接（为了简化配置）：
-    ```html
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              rose: {
-                50: '#fff1f2',
-                100: '#ffe4e6',
-                // ... (复制原始 index.html 中的完整配置)
-                900: '#881337',
-              },
-            },
-            fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
-              serif: ['Merriweather', 'serif'],
-            },
-            animation: {
-              'float': 'float 6s ease-in-out infinite',
-              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            },
-            keyframes: {
-              float: {
-                '0%, 100%': { transform: 'translateY(0)' },
-                '50%': { transform: 'translateY(-10px)' },
-              }
-            }
-          },
-        },
-      }
-    </script>
-    ```
+    确保 `lovespace/index.html` 包含 Tailwind CSS CDN（参考提供的 index.html 代码）。
 
 5.  **配置环境变量 (API Key)**:
     在项目根目录创建 `.env` 文件：
     ```bash
     nano .env
     ```
-    输入以下内容（替换为你的真实 Gemini API Key）：
+    输入以下内容（替换为你的 DeepSeek API Key）：
     ```env
-    VITE_API_KEY=你的_GEMINI_API_KEY
+    VITE_API_KEY=sk-你的DeepSeekKey
     ```
+    *注意：DeepSeek 的 Key 通常以 sk- 开头。*
 
 6.  **编译打包**:
     ```bash
@@ -155,9 +125,8 @@
 使用 Cloudflare Tunnel (cloudflared) 可以让你无需公网 IP 就能从外网访问树莓派。
 
 1.  **安装 cloudflared**:
-    (注意：请根据树莓派架构选择，通常是 arm64 或 armhf)
     ```bash
-    # 下载 cloudflared (以 arm64 为例，如果是老款树莓派可能需要 armhf)
+    # 下载 cloudflared (以 arm64 为例)
     wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-arm64.deb
     sudo dpkg -i cloudflared-linux-arm64.deb
     ```
@@ -172,7 +141,7 @@
     ```bash
     cloudflared tunnel create lovespace
     ```
-    记下输出的 Tunnel ID (例如: `abcd-1234...`)。
+    记下输出的 Tunnel ID。
 
 4.  **配置路由 (DNS)**:
     将你的域名指向这个隧道。假设你想用 `love.yourdomain.com`：
@@ -181,7 +150,7 @@
     ```
 
 5.  **配置隧道文件**:
-    创建配置文件目录和文件：
+    创建配置文件：
     ```bash
     mkdir -p ~/.cloudflared
     nano ~/.cloudflared/config.yml
@@ -196,18 +165,16 @@
         service: http://localhost:3000
       - service: http_status:404
     ```
-    *注意：确认 credentials-file 的路径是正确的，通常 create 命令后会显示路径。*
 
 6.  **运行隧道**:
     ```bash
     cloudflared tunnel run lovespace
     ```
-
-7.  **将其注册为系统服务** (开机自启):
+    或注册为服务后台运行：
     ```bash
     sudo cloudflared service install
     sudo systemctl start cloudflared
     ```
 
-## 恭喜！
-现在，你可以在世界任何地方通过 `https://love.yourdomain.com` 访问你们的纪念日网站了！
+## 完成！
+现在通过你的域名即可访问。AI 功能将由 DeepSeek 强力驱动！

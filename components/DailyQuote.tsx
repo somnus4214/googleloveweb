@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { Quote, RefreshCw, Sparkles } from 'lucide-react';
-import { generateRomanticContent } from '../services/geminiService';
+import { generateRomanticContent } from '../services/aiService';
 
 const PRESET_QUOTES = [
   "斯人若彩虹，遇上方知有。",
@@ -50,7 +51,7 @@ export const DailyQuote: React.FC = () => {
           {loading ? (
              <div className="flex items-center space-x-2 text-rose-400 animate-pulse">
                 <Sparkles className="w-4 h-4" />
-                <span className="text-sm">正在摘录浪漫...</span>
+                <span className="text-sm">DeepSeek 正在摘录浪漫...</span>
              </div>
           ) : (
             <p className="text-lg text-gray-700 font-serif leading-relaxed italic">

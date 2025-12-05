@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { generateRomanticContent } from '../services/geminiService';
+import { generateRomanticContent } from '../services/aiService';
 import { Bot, HeartHandshake, PenTool, Loader2, Sparkles } from 'lucide-react';
 
 interface AiLoveAssistantProps {
@@ -34,7 +35,7 @@ export const AiLoveAssistant: React.FC<AiLoveAssistantProps> = ({ days, dateStr 
         <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-6 text-white">
           <div className="flex items-center space-x-2">
             <Sparkles className="w-6 h-6" />
-            <h3 className="text-xl font-bold">恋爱 AI 助手</h3>
+            <h3 className="text-xl font-bold">恋爱 AI 助手 (DeepSeek)</h3>
           </div>
           <p className="text-rose-100 text-sm mt-1">
             为第 <span className="font-bold text-white">{days}</span> 天（{dateStr}）准备一份惊喜
@@ -86,7 +87,7 @@ export const AiLoveAssistant: React.FC<AiLoveAssistantProps> = ({ days, dateStr 
           {loading && (
             <div className="flex flex-col items-center justify-center py-10 text-rose-400">
               <Loader2 className="w-8 h-8 animate-spin mb-3" />
-              <p className="text-sm animate-pulse">正在用心思考中...</p>
+              <p className="text-sm animate-pulse">DeepSeek 正在用心思考中...</p>
             </div>
           )}
 
