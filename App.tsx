@@ -33,7 +33,7 @@ export default function App() {
           <Heart className="fill-rose-600 w-5 h-5" />
           <span>LoveSpace</span>
           <span className="text-rose-300/50">|</span>
-          <span className="font-serif italic text-rose-700">CL & ZSY</span>
+          <span className="font-serif italic text-rose-700">ZSY & CL</span>
         </div>
         <div className="text-xs text-rose-400 font-mono hidden md:block">
             Since {START_DATE_STRING}
@@ -86,7 +86,7 @@ export default function App() {
       </main>
 
       <footer className="mt-20 text-rose-300 text-sm text-center">
-        <p>&copy; 2025 LoveSpace. 为 CL & ZSY 专属定制。</p>
+        <p>&copy; 2025 LoveSpace. 为 ZSY & CL 专属定制。</p>
       </footer>
     </div>
   );
